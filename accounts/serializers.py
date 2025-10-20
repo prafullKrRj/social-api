@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
-from accounts.models import User
+from accounts.models import User, UserInfo
+from posts.models import Post
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
@@ -42,13 +43,45 @@ class UserLogoutSerializer(serializers.Serializer):
         return attrs
 
 
+# this is the protected one only the user himself can see this information
 class UserProfileSerializer(serializers.ModelSerializer):
+    # changed to explicit safe fields to avoid exposing password/hash
     class Meta:
         model = User
+        fields = ['id', 'username', 'email', 'createdAt', 'updatedAt', 'is_active', 'is_staff']
+        read_only_fields = fields
+
+
+class PostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Post
         fields = '__all__'
 
 
+class UserInfoSerializer(serializers.ModelSerializer):
+    posts_count = serializers.SerializerMethodField()
+    posts = serializers.SerializerMethodField()
+
+    class Meta:
+        model = UserInfo
+        fields = '__all__'
+
+    def get_posts_count(self, obj):
+        return obj.user.posts.count()
+
+    def get_posts(self, obj):
+        return PostSerializer(obj.user.posts.all(), many=True).data
+
+
+# this is the public information can be visible to anyone out there
 class UserDetailSerializer(serializers.ModelSerializer):
+    info = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ['username', 'createdAt']
+        fields = ['username', 'email', 'createdAt', 'info']
+
+    def get_info(self, obj):
+        if hasattr(obj, 'info'):
+            return UserInfoSerializer(obj.info).data
+        return None
