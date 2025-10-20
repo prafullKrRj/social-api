@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from accounts.models import User, UserInfo
 from posts.models import Post
+from posts.serializers import PostSerializer, UserPostsSerializer
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
@@ -52,12 +53,6 @@ class UserProfileSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
 
-class PostSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Post
-        fields = '__all__'
-
-
 class UserInfoSerializer(serializers.ModelSerializer):
     posts_count = serializers.SerializerMethodField()
     posts = serializers.SerializerMethodField()
@@ -70,7 +65,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
         return obj.user.posts.count()
 
     def get_posts(self, obj):
-        return PostSerializer(obj.user.posts.all(), many=True).data
+        return UserPostsSerializer(obj.user.posts.all(), many=True).data
 
 
 # this is the public information can be visible to anyone out there

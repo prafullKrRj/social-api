@@ -8,7 +8,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from accounts.models import User
 from accounts.serializers import UserRegistrationSerializer, UserLoginSerializer, UserLogoutSerializer, \
-    UserProfileSerializer, UserDetailSerializer
+    UserProfileSerializer, UserDetailSerializer, UserInfoSerializer
 
 
 def get_tokens_for_user(user):
@@ -70,12 +70,21 @@ class LogoutView(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-class UserProfileView(generics.RetrieveAPIView):
+class UserProfileView(generics.RetrieveAPIView, generics.UpdateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = UserProfileSerializer
 
     def get_object(self):
         return self.request.user
+
+    def update(self, request, *args, **kwargs):
+        print(request.data)
+        user = getattr(self.request, "user", None)
+        user_info = user.info
+        serializer = UserInfoSerializer(user_info, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class UserDetailView(generics.RetrieveAPIView):
