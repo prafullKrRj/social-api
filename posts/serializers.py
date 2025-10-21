@@ -27,18 +27,6 @@ class PostCreateSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
 
-class PostListSerializer(serializers.ModelSerializer):
-    author = serializers.SerializerMethodField(read_only=True)
-
-    class Meta:
-        model = Post
-        fields = ('id', 'author', 'content', 'created_at')
-
-    def get_author(self, obj):
-        user = obj.author
-        return {'id': user.id, 'username': getattr(user, 'username', None)}
-
-
 class UserPostsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post

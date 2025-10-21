@@ -3,7 +3,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.http import HttpResponseForbidden, HttpResponse
 
 from posts.models import Post
-from posts.serializers import PostListSerializer, PostCreateSerializer, PostSerializer, UserPostsSerializer
+from posts.serializers import PostCreateSerializer, PostSerializer, UserPostsSerializer
 
 
 class PostListCreateView(ListCreateAPIView):
@@ -26,7 +26,7 @@ class PostListCreateView(ListCreateAPIView):
     def get_serializer_class(self):
         if self.request.method == "POST":
             return PostCreateSerializer  # post serializer class and has authentication in here
-        return PostListSerializer
+        return PostSerializer
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)  # in perform create setting the author
