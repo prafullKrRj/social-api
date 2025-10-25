@@ -3,3 +3,4 @@ djangorestframework         # For building RESTful APIs
 djangorestframework-simplejwt   # For JWT authentication
 simplejson          # For enhanced JSON handling
 django-cors-headers # For handling CORS in Django
+psycopg2-binary

@@ -63,11 +63,16 @@ class LogoutView(APIView):
         try:
             refresh_token = serializer.validated_data["refresh"]
             token = RefreshToken(refresh_token)
-            print(token)
             token.blacklist()
-            return Response(status=status.HTTP_205_RESET_CONTENT)
-        except Exception:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"detail": "Successfully logged out."},
+                status=status.HTTP_205_RESET_CONTENT
+            )
+        except Exception as e:
+            return Response(
+                {"detail": str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
 
 class UserProfileView(generics.RetrieveAPIView, generics.UpdateAPIView):

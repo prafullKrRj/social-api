@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'accounts',
     'posts',
     'social',
-    'rest_framework_simplejwt'
+    'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
 ]
 
 MIDDLEWARE = [
@@ -79,10 +80,15 @@ WSGI_APPLICATION = 'socialapi.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'socialapi',
+        'USER': 'postgres',
+        'PASSWORD': '',
+        'HOST': 'localhost',  # or your server address
+        'PORT': '5432',       # default PostgreSQL port
     }
 }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -135,10 +141,10 @@ REST_FRAMEWORK = {
 from datetime import timedelta
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(days=36500),  # ~100 years (effectively lifetime)
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=36500),
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=365),  # ~100 years (effectively lifetime)
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
     "ROTATE_REFRESH_TOKENS": False,
-    "BLACKLIST_AFTER_ROTATION": False,
+    "BLACKLIST_AFTER_ROTATION": True,
     "UPDATE_LAST_LOGIN": False,
 
     "AUTH_HEADER_TYPES": ("Bearer",),
