@@ -5,16 +5,21 @@ from rest_framework.generics import CreateAPIView, ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.pagination import PageNumberPagination
 
 from accounts.models import User
 from posts.serializers import PostSerializer
 from social.models import Follow
 from social.serializer import FollowSerializer, FollowerListSerializer, FollowingListSerializer
 
-from posts.models import Post  # Import your Post model
+from posts.models import Post
 
 
-# Create your views here.
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
 
 class FollowUserView(APIView):  # (POST) - follow a user
     permission_classes = [IsAuthenticated]
@@ -72,6 +77,7 @@ class UnfollowUserView(APIView):  # (DELETE)
 class FollowersListView(ListAPIView):  # (GET) - who follows me
     permission_classes = [IsAuthenticated]
     serializer_class = FollowerListSerializer
+    pagination_class = StandardResultsSetPagination
 
     def get_queryset(self):
         # We want to find all 'Follow' objects where the 'following' user is the current user
@@ -81,6 +87,7 @@ class FollowersListView(ListAPIView):  # (GET) - who follows me
 class FollowingListView(ListAPIView):  # (GET) - who I follow
     permission_classes = [IsAuthenticated]
     serializer_class = FollowingListSerializer
+    pagination_class = StandardResultsSetPagination
 
     def get_queryset(self):
         # We want to find all 'Follow' objects where the 'follower' is the current user
@@ -90,6 +97,7 @@ class FollowingListView(ListAPIView):  # (GET) - who I follow
 class FeedView(ListAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = PostSerializer  # You'll need to create this
+    pagination_class = StandardResultsSetPagination
 
     def get_queryset(self):
         following_users = self.request.user.following.values_list('following', flat=True)
