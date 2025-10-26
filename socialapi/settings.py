@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 from pickle import APPENDS
+from datetime import timedelta
+from decouple import config, Csv
 
 from django.conf.global_settings import APPEND_SLASH
 
@@ -22,12 +24,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-vk(6aj)6p#sk!%#3s)z58=eltt@+z+5233pd+v64o_owjwezql'
+SECRET_KEY = config('SECRET_KEY', default='django-insecure-vk(6aj)6p#sk!%#3s)z58=eltt@+z+5233pd+v64o_owjwezql')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='*', cast=Csv())
 
 # Application definition
 
@@ -80,12 +82,12 @@ WSGI_APPLICATION = 'socialapi.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'socialapi',
-        'USER': 'postgres',
-        'PASSWORD': '',
-        'HOST': 'localhost',  # or your server address
-        'PORT': '5432',       # default PostgreSQL port
+        'ENGINE': config('DB_ENGINE', default='django.db.backends.postgresql'),
+        'NAME': config('DB_NAME', default='socialapi'),
+        'USER': config('DB_USER', default='postgres'),
+        'PASSWORD': config('DB_PASSWORD', default=''),
+        'HOST': config('DB_HOST', default='localhost'),
+        'PORT': config('DB_PORT', default='5432'),
     }
 }
 
@@ -138,11 +140,9 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 20
 }
 
-from datetime import timedelta
-
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(days=365),  # ~100 years (effectively lifetime)
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=config('ACCESS_TOKEN_LIFETIME_DAYS', default=365, cast=int)),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=config('REFRESH_TOKEN_LIFETIME_DAYS', default=30, cast=int)),
     "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": True,
     "UPDATE_LAST_LOGIN": False,
